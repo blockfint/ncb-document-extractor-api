@@ -1,0 +1,8 @@
+type: object
+properties:
+  code:
+    type: string
+    example: 10
+  description:
+    type: string
+    example: ปกติ

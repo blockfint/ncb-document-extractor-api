@@ -1,0 +1,88 @@
+description: All fields can be null depending on NCB file
+type: object
+properties:
+  report_id:
+    type: string
+    example: 103938080
+  issued_at:
+    type: string
+    example: '17 ก.พ 2566 14:14:22'
+  inquired_at:
+    type: string
+    example: '17 ก.พ 2566 14:14:21'
+  inquirer:
+    $ref: ./Inquirer.yaml
+  inquirer_name:
+    type: string
+    example: auto
+  ref_number:
+    type: string
+    example: UMS2023
+  full_names:
+    type: array
+    description: Name can have multiple names according to the NCB  files.
+    items:
+      type: string
+    example:
+      - นายขจรศักดิ์ ชอบค้า
+      - นาย สมใจ ชอบค้า
+  national_id_number:
+    type: string
+    example: 1149900642664
+  state_official_id_number:
+    type: string
+    example: 0018-56-03784
+  birthdate:
+    type: string
+    example: 3 ม.ค 2524
+  nationality:
+    type: string
+    example: ไทย
+  nation:
+    type: string
+    example: ไทย
+  gender:
+    type: string
+    example: ชาย
+  marital_status:
+    type: string
+    example: โสด
+  passport_number:
+    type: string
+    example: ABA9875413
+  credit_score_type:
+    type: string
+    example: GE02
+  credit_score:
+    type: integer
+    example: 754
+  risk_grade:
+    type: string
+    example: AA
+  repayment_probability:
+    type: integer
+    example: 97
+  addresses:
+    type: array
+    items:
+      type: string
+    example:
+      - >-
+        300/120 มบ.พรไพลิน ซ.ลาดพร้าว35/1 จันทรเ กษม จตุจักร กทม. 10900 กทม.
+        10900
+      - >-
+        เลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จันทรเกษมจตุจักร
+        กรุงเทพมหานคร TH
+      - >-
+        หจก.อมฤตซิสเต็มเลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จตุจักร
+        จันทรเกษม กรุงเทพมหานคร 10230 TH
+  total_number_of_accounts:
+    type: integer
+    example: 15
+  number_of_accounts_with_correction_request:
+    type: integer
+    example: 3
+  accounts:
+    type: array
+    items:
+      $ref: ./Account.yaml

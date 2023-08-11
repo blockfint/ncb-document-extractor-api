@@ -1,0 +1,76 @@
+type: object
+description: The field can be nullable when there is "no information" in the field.
+properties:
+  order:
+    type: integer
+    description: order of the account
+    example: 1
+  type:
+    type: string
+    example: สินเชื่อบัตรเครดิต
+  credit_provider:
+    type: string
+    example: KTC - บริษัท บัตรกรุงไทย จำกัด (มหาชน)
+  updated_date:
+    type: string
+    example: 31 ม.ค 2566
+  account_number:
+    type: string
+    example: 9287648376678764
+  opening_date:
+    type: string
+    example: 29 ก.ย. 2554
+  closing_date:
+    type: string
+    example: 29 ก.ย. 2566
+  latest_payment_date:
+    type: string
+    example: 21 พ.ค. 2565
+  refinancing_date:
+    type: string
+    example: 29 ก.ย. 2554
+  status:
+    $ref: ./AccountStatus.yaml
+  arrangement_type:
+    type: string
+    example: กู้เดี่ยว
+  number_of_co_borrowers:
+    type: integer
+    description: nullable
+    example: null
+  credit_limit:
+    type: object
+    properties:
+      amount:
+        type: integer
+        example: 100000
+      desription:
+        type: string
+        example: วงเงินร่วม
+  credit_utilized:
+    type: integer
+    example: 30000
+  overdue_amount:
+    type: integer
+    example: 200000
+  installment_amount:
+    type: integer
+    example: 20000
+  installment_term:
+    type: integer
+    example: 64
+  minimum_payment_percentage:
+    type: integer
+    example: 10
+  credit_card_type:
+    type: string
+    example: MC (Master Card)
+  start_of_overdue_payment_date:
+    type: string
+    example: 29 ก.ย. 2556
+  payment_history:
+    type: array
+    items:
+      $ref: ./Payment.yaml
+  signature_verification:
+    $ref: ./SignatureVerification.yaml

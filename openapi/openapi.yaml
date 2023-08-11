@@ -1,0 +1,18 @@
+openapi: 3.0.3
+info:
+  version: '1'
+  title: NCB Document Extractor Service APIs
+  description: ''
+servers:
+  - url: 'localhost:8000/api/v1'
+security:
+  - apiKeyHeader: []
+paths:
+  /ncb-document/extract:
+    $ref: paths/ncb-document@extract.yaml
+components:
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key

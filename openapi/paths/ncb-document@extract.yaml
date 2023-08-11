@@ -1,0 +1,36 @@
+post:
+  summary: Extract information from a NCB document PDF file
+  operationId: postNcbDocumentExtract
+  tags:
+    - Extract NCB Document
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - file
+          properties:
+            file:
+              type: string
+              format: binary
+              description: A NCB document PDF file
+            password:
+              type: string
+              description: Password for opening the PDF file
+  responses:
+    '200':
+      description: Successfully extracted information from the NCB document
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/ExtractNcbDocumentResponse.yaml
+    '400':
+      description: Bad request. Invalid input or missing parameters.
+    '422':
+      description: >-
+        Unprocessable Entity. Either the uploaded NCB document version is not
+        supported or it is invalid.
+    '500':
+      description: Internal server error. An error occurred during processing.

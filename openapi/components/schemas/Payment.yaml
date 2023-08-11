@@ -1,0 +1,17 @@
+type: object
+properties:
+  updated_month:
+    type: string
+    example: มิ.ย 2564
+  outstanding_balance:
+    type: number
+    example: 33532
+  overdue_status:
+    type: object
+    properties:
+      status:
+        type: string
+        example: 0
+      description:
+        type: string
+        example: ไม่ค้างชำระหรือค้างชำระไม่เกิน 30 วัน

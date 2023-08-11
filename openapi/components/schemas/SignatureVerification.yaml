@@ -1,0 +1,25 @@
+type: object
+properties:
+  result:
+    type: string
+    description: 'Enum: VALID, INVALID, NA'
+    example: VALID
+  verified_at:
+    type: string
+    format: ISO-8601 datetime
+    example: 2023-08-11T10:40:09.851Z
+  details:
+    type: object
+    properties:
+      signed_by:
+        type: string
+        example: บริษัท ข้อมูลเครดิตแห่งชาติ จำกัด <consumer@ncb.co.th>
+      signed_reason:
+        type: string
+        example: >-
+          รายงานข้อมูลเครดิตฉบับนี้ ออกโดยบริษัท ข้อมูลเครดิตแห่งชาติ จำกัด
+          และจัดส่งให้เจ้าของข้อมูลด้วยวิธีการทางอิเล็กทรอนิกส์
+      signed_at:
+        type: string
+        format: ISO-8601 datetime
+        example: 2023-08-11T10:40:09.851Z
