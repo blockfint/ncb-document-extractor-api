@@ -1,0 +1,282 @@
+openapi: 3.0.3
+info:
+  version: '1'
+  title: NCB Document Extractor Service APIs
+  description: ''
+servers:
+  - url: localhost:8000/api/v1
+security:
+  - apiKeyHeader: []
+paths:
+  /ncb-document/extract:
+    post:
+      summary: Extract information from a NCB document PDF file
+      operationId: postNcbDocumentExtract
+      tags:
+        - Extract NCB Document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: A NCB document PDF file
+                password:
+                  type: string
+                  description: Password for opening the PDF file
+      responses:
+        '200':
+          description: Successfully extracted information from the NCB document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractNcbDocumentResponse'
+        '400':
+          description: Bad request. Invalid input or missing parameters.
+        '422':
+          description: >-
+            Unprocessable Entity. Either the uploaded NCB document version is
+            not supported or it is invalid.
+        '500':
+          description: Internal server error. An error occurred during processing.
+components:
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    Inquirer:
+      type: object
+      properties:
+        name:
+          type: string
+          example: auto
+        user_id:
+          type: string
+          example: ZZ09287777
+    AccountStatus:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 10
+        description:
+          type: string
+          example: ปกติ
+    Payment:
+      type: object
+      properties:
+        updated_month:
+          type: string
+          example: มิ.ย 2564
+        outstanding_balance:
+          type: number
+          example: 33532
+        overdue_status:
+          type: object
+          properties:
+            status:
+              type: string
+              example: 0
+            description:
+              type: string
+              example: ไม่ค้างชำระหรือค้างชำระไม่เกิน 30 วัน
+    SignatureVerification:
+      type: object
+      properties:
+        result:
+          type: string
+          description: 'Enum: VALID, INVALID, NA'
+          example: VALID
+        verified_at:
+          type: string
+          format: ISO-8601 datetime
+          example: '2023-08-11T10:40:09.851Z'
+        details:
+          type: object
+          properties:
+            signed_by:
+              type: string
+              example: บริษัท ข้อมูลเครดิตแห่งชาติ จำกัด <consumer@ncb.co.th>
+            signed_reason:
+              type: string
+              example: >-
+                รายงานข้อมูลเครดิตฉบับนี้ ออกโดยบริษัท ข้อมูลเครดิตแห่งชาติ
+                จำกัด และจัดส่งให้เจ้าของข้อมูลด้วยวิธีการทางอิเล็กทรอนิกส์
+            signed_at:
+              type: string
+              format: ISO-8601 datetime
+              example: '2023-08-11T10:40:09.851Z'
+    Account:
+      type: object
+      description: The field can be nullable when there is "no information" in the field.
+      properties:
+        order:
+          type: integer
+          description: order of the account
+          example: 1
+        type:
+          type: string
+          example: สินเชื่อบัตรเครดิต
+        credit_provider:
+          type: string
+          example: KTC - บริษัท บัตรกรุงไทย จำกัด (มหาชน)
+        updated_date:
+          type: string
+          example: 31 ม.ค 2566
+        account_number:
+          type: string
+          example: 9287648376678764
+        opening_date:
+          type: string
+          example: 29 ก.ย. 2554
+        closing_date:
+          type: string
+          example: 29 ก.ย. 2566
+        latest_payment_date:
+          type: string
+          example: 21 พ.ค. 2565
+        refinancing_date:
+          type: string
+          example: 29 ก.ย. 2554
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+        arrangement_type:
+          type: string
+          example: กู้เดี่ยว
+        number_of_co_borrowers:
+          type: integer
+          description: nullable
+          example: null
+        credit_limit:
+          type: object
+          properties:
+            amount:
+              type: integer
+              example: 100000
+            desription:
+              type: string
+              example: วงเงินร่วม
+        credit_utilized:
+          type: integer
+          example: 30000
+        overdue_amount:
+          type: integer
+          example: 200000
+        installment_amount:
+          type: integer
+          example: 20000
+        installment_term:
+          type: integer
+          example: 64
+        minimum_payment_percentage:
+          type: integer
+          example: 10
+        credit_card_type:
+          type: string
+          example: MC (Master Card)
+        start_of_overdue_payment_date:
+          type: string
+          example: 29 ก.ย. 2556
+        payment_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        signature_verification:
+          $ref: '#/components/schemas/SignatureVerification'
+    ExtractNcbDocumentResponse:
+      description: All fields can be null depending on NCB file
+      type: object
+      properties:
+        report_id:
+          type: string
+          example: 103938080
+        issued_at:
+          type: string
+          example: 17 ก.พ 2566 14:14:22
+        inquired_at:
+          type: string
+          example: 17 ก.พ 2566 14:14:21
+        inquirer:
+          $ref: '#/components/schemas/Inquirer'
+        inquirer_name:
+          type: string
+          example: auto
+        ref_number:
+          type: string
+          example: UMS2023
+        full_names:
+          type: array
+          description: Name can have multiple names according to the NCB  files.
+          items:
+            type: string
+          example:
+            - นายขจรศักดิ์ ชอบค้า
+            - นาย สมใจ ชอบค้า
+        national_id_number:
+          type: string
+          example: 1149900642664
+        state_official_id_number:
+          type: string
+          example: 0018-56-03784
+        birthdate:
+          type: string
+          example: 3 ม.ค 2524
+        nationality:
+          type: string
+          example: ไทย
+        nation:
+          type: string
+          example: ไทย
+        gender:
+          type: string
+          example: ชาย
+        marital_status:
+          type: string
+          example: โสด
+        passport_number:
+          type: string
+          example: ABA9875413
+        credit_score_type:
+          type: string
+          example: GE02
+        credit_score:
+          type: integer
+          example: 754
+        risk_grade:
+          type: string
+          example: AA
+        repayment_probability:
+          type: integer
+          example: 97
+        addresses:
+          type: array
+          items:
+            type: string
+          example:
+            - >-
+              300/120 มบ.พรไพลิน ซ.ลาดพร้าว35/1 จันทรเ กษม จตุจักร กทม. 10900
+              กทม. 10900
+            - >-
+              เลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จันทรเกษมจตุจักร
+              กรุงเทพมหานคร TH
+            - >-
+              หจก.อมฤตซิสเต็มเลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จตุจักร
+              จันทรเกษม กรุงเทพมหานคร 10230 TH
+        total_number_of_accounts:
+          type: integer
+          example: 15
+        number_of_accounts_with_correction_request:
+          type: integer
+          example: 3
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
