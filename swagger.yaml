@@ -8,7 +8,43 @@ servers:
 security:
   - apiKeyHeader: []
 paths:
-  /ncb-document/extract:
+  /ncb-document/verify:
+    post:
+      summary: Validate a NCB document PDF file
+      operationId: postNcbDocumentVerify
+      tags:
+        - Verify NCB Document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: A NCB document PDF file
+                password:
+                  type: string
+                  description: Password for opening the PDF file
+      responses:
+        200:
+          description: Successfully validate information from the NCB document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignatureVerification"
+        400:
+          description: Bad request. Invalid input or missing parameters.
+        422:
+          description: Unprocessable Entity. Either the uploaded NCB document version is not supported or it is invalid.
+        500:
+          description: Internal server error. An error occurred during processing.
+
+  /ncb-document/extract/full:
     post:
       summary: Extract information from a NCB document PDF file
       operationId: postNcbDocumentExtract
@@ -36,13 +72,50 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExtractNcbDocumentResponse'
+                $ref: "#/components/schemas/ExtractNcbDocumentResponse"
         400:
           description: Bad request. Invalid input or missing parameters.
         422:
           description: Unprocessable Entity. Either the uploaded NCB document version is not supported or it is invalid.
         500:
           description: Internal server error. An error occurred during processing.
+
+  /ncb-document/extract/score:
+    post:
+      summary: Extract NCB score information from a NCB document PDF file
+      operationId: postNcbScoreExtract
+      tags:
+        - Extract NCB Document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: A NCB document PDF file
+                password:
+                  type: string
+                  description: Password for opening the PDF file
+      responses:
+        200:
+          description: Successfully extracted NCB score information from the NCB document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtractNcbScoreResponse"
+        400:
+          description: Bad request. Invalid input or missing parameters.
+        422:
+          description: Unprocessable Entity. Either the uploaded NCB document version is not supported or it is invalid.
+        500:
+          description: Internal server error. An error occurred during processing.
+
 components:
   securitySchemes:
     apiKeyHeader:
@@ -52,11 +125,32 @@ components:
   schemas:
     ExtractNcbDocumentResponse:
       description: All fields can be null depending on NCB file
+      allOf:
+        - $ref: "#/components/schemas/PersonalInfo"
+        - type: object
+        - properties:
+            total_number_of_accounts:
+              type: integer
+              example: 15
+            number_of_accounts_with_correction_request:
+              type: integer
+              example: 3
+            accounts:
+              type: array
+              items:
+                $ref: "#/components/schemas/Account"
+
+    ExtractNcbScoreResponse:
+      description: All fields can be null depending on NCB file
+      allOf:
+        - $ref: "#/components/schemas/PersonalInfo"
+
+    PersonalInfo:
       type: object
       properties:
         report_id:
           type: string
-          example: 103938080
+          example: "103938080"
         issued_at:
           type: string
           example: 17 ก.พ 2566 14:14:22
@@ -76,13 +170,13 @@ components:
           description: Name can have multiple names according to the NCB  files.
           items:
             type: string
-          example: ["นายขจรศักดิ์ ชอบค้า","นาย สมใจ ชอบค้า"]
+          example: ["นายขจรศักดิ์ ชอบค้า", "นาย สมใจ ชอบค้า"]
         national_id_number:
           type: string
-          example: 1149900642664
+          example: "1149900642664"
         state_official_id_number:
           type: string
-          example: 0018-56-03784
+          example: "0018-56-03784"
         birthdate:
           type: string
           example: 3 ม.ค 2524
@@ -104,33 +198,27 @@ components:
         credit_score_type:
           type: string
           example: GE02
-        credit_score: 
+        credit_score:
           type: integer
           example: 754
         risk_grade:
           type: string
           example: AA
-        repayment_probability: 
+        repayment_probability:
           type: integer
           example: 97
         addresses:
           type: array
           items:
             type: string
-          example: ['300/120 มบ.พรไพลิน ซ.ลาดพร้าว35/1 จันทรเ กษม จตุจักร กทม. 10900 กทม. 10900', 'เลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จันทรเกษมจตุจักร กรุงเทพมหานคร TH', 'หจก.อมฤตซิสเต็มเลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จตุจักร จันทรเกษม กรุงเทพมหานคร 10230 TH']
-        total_number_of_accounts:
-          type: integer
-          example: 15
-        number_of_accounts_with_correction_request:
-          type: integer
-          example: 3
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Account'
+          example:
+            [
+              "300/120 มบ.พรไพลิน ซ.ลาดพร้าว35/1 จันทรเ กษม จตุจักร กทม. 10900 กทม. 10900",
+              "เลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จันทรเกษมจตุจักร กรุงเทพมหานคร TH",
+              "หจก.อมฤตซิสเต็มเลขที่300/120 ซอยลาดพร้าว 35/1 ถนนลาดพร้าว จตุจักร จันทรเกษม กรุงเทพมหานคร 10230 TH",
+            ]
         signature_verification:
-          $ref: '#/components/schemas/SignatureVerification'
-            
+          $ref: "#/components/schemas/SignatureVerification"
     Account:
       type: object
       description: The field can be nullable when there is "no information" in the field.
@@ -150,7 +238,7 @@ components:
           example: 31 ม.ค 2566
         account_number:
           type: string
-          example: 9287648376678764
+          example: "9287648376678764"
         opening_date:
           type: string
           example: 29 ก.ย. 2554
@@ -164,7 +252,7 @@ components:
           type: string
           example: 29 ก.ย. 2554
         status:
-          $ref: '#/components/schemas/AccountStatus'
+          $ref: "#/components/schemas/AccountStatus"
         arrangement_type:
           type: string
           example: กู้เดี่ยว
@@ -205,27 +293,27 @@ components:
         payment_history:
           type: array
           items:
-            $ref: '#/components/schemas/Payment'
-            
+            $ref: "#/components/schemas/Payment"
+
     Payment:
       type: object
       properties:
         updated_month:
           type: string
-          example: มิ.ย 2564 
+          example: มิ.ย 2564
         outstanding_balance:
-          type: number
+          type: integer
           example: 33532
         overdue_status:
           type: object
           properties:
             status:
               type: string
-              example: 0
+              example: "0"
             description:
               type: string
               example: ไม่ค้างชำระหรือค้างชำระไม่เกิน 30 วัน
-          
+
     Inquirer:
       type: object
       properties:
@@ -235,23 +323,23 @@ components:
         user_id:
           type: string
           example: ZZ09287777
-          
+
     AccountStatus:
       type: object
       properties:
         code:
           type: string
-          example: 10
+          example: "10"
         description:
           type: string
           example: ปกติ
-          
+
     SignatureVerification:
       type: object
       properties:
         result:
           type: string
-          description: 'Enum: VALID, INVALID, NA'
+          description: "Enum: VALID, INVALID, NA"
           example: VALID
         verified_at:
           type: string
@@ -270,4 +358,3 @@ components:
               type: string
               format: ISO-8601 datetime
               example: 2023-08-11T10:40:09.851Z
-              
