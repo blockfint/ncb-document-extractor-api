@@ -358,3 +358,7 @@ components:
               type: string
               format: ISO-8601 datetime
               example: 2023-08-11T10:40:09.851Z
+        password_verification_result:
+          type: string
+          description: "Enum: VALID, INVALID, NA"
+          example: VALID
